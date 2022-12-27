@@ -51,7 +51,30 @@ export default function TabOneScreen({
 }: RootTabScreenProps<"TabOne">) {
   const [search, setSearch] = useState("");
 
+  // TODO: Would be better to use an enum here
+  const [provider, setProvider] = useState<
+    "googleBookSearch" | "openLibrarySearch"
+  >("googleBookSearch");
+
   const [runQuery, { data, loading, error }] = useLazyQuery(query);
+
+  const parseBook = (item: any): Book => {
+    if (provider == "googleBookSearch") {
+      return {
+        title: item.volumeInfo.title,
+        image: item.volumeInfo.imageLinks.thumbnail,
+        authors: item.volumeInfo.authors,
+        isbn: item.volumeInfo.industryIdentifiers?.[0]?.identifier,
+      };
+    } else {
+      return {
+        image: `https://covers.openlibrary.org/b/olid/${item.cover_edition_key}-M.jpg`,
+        title: item.title,
+        authors: item.author_name,
+        isbn: item.isbn?.[0],
+      };
+    }
+  };
 
   console.log(data);
 
@@ -70,25 +93,43 @@ export default function TabOneScreen({
         />
       </View>
 
+      <View style={styles.tabs}>
+        <Text
+          style={
+            provider === "googleBookSearch"
+              ? styles.selectedTab
+              : styles.unSelectedTab
+          }
+          onPress={() => setProvider("googleBookSearch")}
+        >
+          Google Books
+        </Text>
+        <Text
+          style={
+            provider === "openLibrarySearch"
+              ? styles.selectedTab
+              : styles.unSelectedTab
+          }
+          onPress={() => setProvider("openLibrarySearch")}
+        >
+          Open Library
+        </Text>
+      </View>
+
       {loading && <ActivityIndicator />}
       {error && (
         <>
-          <Text style={styles.title}>Error Fetching books</Text>
+          , <Text style={styles.title}>Error Fetching books</Text>
           <Text>{error.message}</Text>
         </>
       )}
       <FlatList
-        data={data?.googleBooksSearch?.items || []}
-        renderItem={({ item }) => (
-          <BookItem
-            book={{
-              title: item.volumeInfo.title,
-              image: item.volumeInfo.imageLinks.thumbnail,
-              authors: item.volumeInfo.authors,
-              isbn: item.volumeInfo.industryIdentifiers?.[0]?.identifier,
-            }}
-          />
-        )}
+        data={
+          (provider == "googleBookSearch"
+            ? data?.googleBooksSearch?.items
+            : data?.openLibrarySearch.docs) || []
+        }
+        renderItem={({ item }) => <BookItem book={parseBook(item)} />}
         showsVerticalScrollIndicator={false}
       />
     </View>
@@ -121,4 +162,15 @@ const styles = StyleSheet.create({
     padding: 10,
     marginVertical: 5,
   },
+  tabs: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    height: 50,
+    alignItems: "center",
+  },
+  selectedTab: {
+    fontWeight: "bold",
+    color: "royalblue",
+  },
+  unSelectedTab: {},
 });
