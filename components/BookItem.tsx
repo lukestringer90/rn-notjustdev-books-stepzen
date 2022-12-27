@@ -5,13 +5,13 @@ type BookItemProps = {
   book: Book;
 };
 
-// Desctruction to props to access the 'book'
+// Destructure to props to access the 'book'
 // 'book' is of type BookItemProps
 const BookItem = ({ book }: BookItemProps) => {
   return (
     <View style={styles.container}>
       <Image source={{ uri: book.image }} style={styles.image} />
-      <View style={styles.container}>
+      <View style={styles.contentContainer}>
         <Text style={styles.title}>{book.title}</Text>
         <Text>by {book.authors?.join(", ")}</Text>
       </View>
@@ -26,16 +26,16 @@ const styles = StyleSheet.create({
   },
   image: {
     flex: 1,
-    aspectRation: 2 / 3,
+    aspectRatio: 2 / 3,
     marginRight: 10,
   },
   contentContainer: {
-    flex: 4,
+    // flex: 4,
     borderColor: "lightgray",
     borderBottomWidth: 0.5,
   },
   title: {
-    fontsize: 16,
+    fontSize: 16,
     fontWeight: "500",
   },
 });
