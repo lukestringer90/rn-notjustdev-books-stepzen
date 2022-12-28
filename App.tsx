@@ -5,6 +5,8 @@ import useCachedResources from "./hooks/useCachedResources";
 import useColorScheme from "./hooks/useColorScheme";
 import Navigation from "./navigation";
 
+import MyBooksProvider from "./components/context/MyBooksProvider";
+
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 
 const API_KEY =
@@ -28,7 +30,9 @@ export default function App() {
       <SafeAreaProvider>
         {/* Embed in higher order component ApolloProvider*/}
         <ApolloProvider client={client}>
-          <Navigation colorScheme={colorScheme} />
+          <MyBooksProvider>
+            <Navigation colorScheme={colorScheme} />
+          </MyBooksProvider>
         </ApolloProvider>
         <StatusBar />
       </SafeAreaProvider>
